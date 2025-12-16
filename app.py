@@ -712,7 +712,6 @@ if uploaded_file:
                                 raw_future = d.get('futureCredit', 0) or 0
                             else: error_msg = f"HTTP {res.status_code}"
                         except Exception as e: error_msg = str(e)
-                        st.markdown(d)
                         final_wotc = float(raw_wotc)
                         final_fez = float(raw_fez)
 
