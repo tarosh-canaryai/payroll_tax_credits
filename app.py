@@ -727,8 +727,8 @@ if uploaded_file:
                         total_fez += final_fez
                         total_past += float(raw_past)
                         total_future += float(raw_future)
-                        # grand_total = total_wotc + total_fez + total_past + total_future
-                        grand_total = total_wotc + total_fez  + total_future
+                        grand_total = total_wotc + total_fez + total_past + total_future
+                        # grand_total = total_wotc + total_fez  + total_future
 
                         wotc_ph.metric("WOTC Savings", f"${total_wotc:,.2f}")
                         fez_ph.metric("FEZ Savings", f"${total_fez:,.2f}")
