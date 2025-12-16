@@ -398,9 +398,6 @@ def suggest_column(options: List[str], keywords: List[str]) -> int:
                 highest_score = score
                 best_match_col = col
     
-    # if best_match_col:
-    #     st.sidebar.write(f"🔍 Search: **{keywords[0]}** | Found: `{best_match_col}` | Score: `{highest_score}`")
-    
     if highest_score < 80 or best_match_col is None: return 0
     try:
         return options.index(best_match_col)
@@ -471,61 +468,19 @@ if uploaded_file:
         with c_conf2:
             addr_mode = st.radio("Address Format:", ("Consolidated Address Column", "Separate Columns"), index=1)
 
-        
         COL_OPTIONS = ["NA"] + list(df.columns)
         
-        kw_st = [
-            'street', 'address line 1', 'residence street',
-            'street address', 'street name', 'addr1'
-        ]
-        kw_city = [
-            'city','town', 'residence city',
-            'municipality', 'locality'
-        ]
-        kw_state = [
-            'state', 'st', 'province', 'region', 'territory', 'residence state',
-            'state code', 'state name'
-        ]
-        kw_zip = [
-            'zip', 'postal code', 'zip code',
-            'postcode', 'pin code'
-        ]
-        
-
-        kw_id = [
-            'id', 'employee id', 'emp id', 'staff id', 'number', 'worker id',
-            'employee number', 'emp number', 'personnel id', 'badge id'
-        ]
-
-        kw_full_addr = [
-            'address', 'employee address', 'home address', 'full address',
-            'residential address', 'mailing address', 'complete address'
-        ]
-
-        kw_age = [
-            'age', 'dob', 'date of birth',
-            'birth date', 'birth year'
-        ]
-
-        kw_hire = [
-            'hire date', 'start date', 'date hired', 'joining date',
-            'date of joining', 'employment start'
-        ]
-
-        kw_term = [
-            'termination date', 'exit date', 'separation date', 'end date',
-            'relieving date', 'last working day', 'work ending date'
-        ]
-
-        kw_wage = [
-            'wage', 'salary', 'pay rate', 'gross pay', 'compensation',
-            'base salary', 'monthly salary', 'annual salary', 'rate of pay'
-        ]
-
-        kw_co_addr = [
-            'company address', 'office address', 'corporate address', 'business address',
-            'registered office', 'head office address'
-        ]
+        kw_st = ['street', 'address line 1', 'residence street', 'street address', 'street name', 'addr1']
+        kw_city = ['city', 'town', 'residence city', 'municipality', 'locality']
+        kw_state = ['state', 'st', 'province', 'region', 'territory', 'residence state', 'state code', 'state name']
+        kw_zip = ['zip', 'postal code', 'zip code', 'postcode', 'pin code']
+        kw_id = ['id', 'employee id', 'emp id', 'staff id', 'number', 'worker id', 'employee number', 'emp number', 'personnel id', 'badge id']
+        kw_full_addr = ['address', 'employee address', 'home address', 'full address', 'residential address', 'mailing address', 'complete address']
+        kw_age = ['age', 'dob', 'date of birth', 'birth date', 'birth year']
+        kw_hire = ['hire date', 'start date', 'date hired', 'joining date', 'date of joining', 'employment start']
+        kw_term = ['termination date', 'exit date', 'separation date', 'end date', 'relieving date', 'last working day', 'work ending date']
+        kw_wage = ['wage', 'salary', 'pay rate', 'gross pay', 'compensation', 'base salary', 'monthly salary', 'annual salary', 'rate of pay']
+        kw_co_addr = ['company address', 'office address', 'corporate address', 'business address', 'registered office', 'head office address']
 
         def get_col(lbl, kws, k, req=False):
             return st.selectbox(f"{lbl} {'*' if req else ''}", COL_OPTIONS, index=suggest_column(COL_OPTIONS, kws), key=k)
@@ -537,7 +492,6 @@ if uploaded_file:
         with c3: col_wage = get_col("Wage", kw_wage, 'cwage', True)
         with c4: col_term = get_col("Termination Date", kw_term, 'cterm')
 
-        
         col_st, col_city, col_state, col_zip, col_full = None, None, None, None, None
         if addr_mode == "Consolidated Address Column":
             c_addr1, c_age = st.columns([2, 1])
@@ -579,19 +533,16 @@ if uploaded_file:
                 total_employees = len(process_df)
                 
                 st.subheader("Savings Dashboard")
-                m1, m2, m5 = st.columns(3)
+                # UPDATED: Only 3 Columns (Removed Past/Future)
+                m1, m2, m3 = st.columns(3)
                 
                 with m1: wotc_ph = st.empty()
                 with m2: fez_ph = st.empty()
-                # with m3: past_ph = st.empty()
-                # with m4: future_ph = st.empty()
-                with m5: grand_total_ph = st.empty()
+                with m3: grand_total_ph = st.empty()
                 
                 # Initial State
                 wotc_ph.metric("WOTC Savings", "$0.00")
                 fez_ph.metric("FEZ Savings", "$0.00")
-                # past_ph.metric("Past Credits", "$0.00")
-                # future_ph.metric("Future Credits (per year)", "$0.00")
                 grand_total_ph.metric("GRAND TOTAL", "$0.00")
                 
                 prog_bar = st.progress(0)
@@ -600,8 +551,6 @@ if uploaded_file:
 
                 total_wotc = 0.0
                 total_fez = 0.0
-                # total_past = 0.0
-                # total_future = 0.0
                 results_data = []
 
                 for index, row in process_df.iterrows():
@@ -707,12 +656,10 @@ if uploaded_file:
                             if res.status_code == 200:
                                 d = res.json()
                                 raw_wotc = d.get('wotcCredit', 0) or 0
-                                # raw_fez = d.get('fezCredit', 0) or 0
-                                # raw_past = d.get('pastCredit', 0) or 0
-                                raw_future = d.get('futureCredit', 0) or 0
+                                raw_fez = d.get('fezCredit', 0) or 0
                             else: error_msg = f"HTTP {res.status_code}"
                         except Exception as e: error_msg = str(e)
-                        # st.markdown(d)
+                        
                         final_wotc = float(raw_wotc)
                         final_fez = float(raw_fez)
 
@@ -726,15 +673,10 @@ if uploaded_file:
                         # --- AGGREGATE ---
                         total_wotc += final_wotc
                         total_fez += final_fez
-                        # total_past += float(raw_past)
-                        # total_future += float(raw_future)
-                        # grand_total = total_wotc + total_fez + total_past + total_future
-                        grand_total = total_wotc + total_fez  
+                        grand_total = total_wotc + total_fez
 
                         wotc_ph.metric("WOTC Savings", f"${total_wotc:,.2f}")
                         fez_ph.metric("FEZ Savings", f"${total_fez:,.2f}")
-                        # past_ph.metric("Past Credits", f"${total_past:,.2f}")
-                        # future_ph.metric("Future Credits (per year)", f"${total_future:,.2f}")
                         grand_total_ph.metric("GRAND TOTAL", f"${grand_total:,.2f}")
 
                         row_result = {
@@ -743,14 +685,12 @@ if uploaded_file:
                             "API_Hire_Date": api_hire_date_str,
                             "API_Term_Date": api_term_date_str,
                             "WOTC": final_wotc, "FEZ": final_fez, 
-                            # "Past": raw_past, "Future": raw_future,
                             "Total": final_wotc + final_fez,
                             "Wage_Used": annualized_wage,
                             "Status": "Error" if error_msg else "Success"
                         }
                         if error_msg: row_result["Error"] = error_msg
                         results_data.append(row_result)
-                        
                         
                         table_placeholder.dataframe(pd.DataFrame(results_data), width='stretch')
                     
