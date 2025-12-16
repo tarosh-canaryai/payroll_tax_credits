@@ -579,19 +579,19 @@ if uploaded_file:
                 total_employees = len(process_df)
                 
                 st.subheader("Savings Dashboard")
-                m1, m2, m3, m4, m5 = st.columns(5)
+                m1, m2, m5 = st.columns(3)
                 
                 with m1: wotc_ph = st.empty()
                 with m2: fez_ph = st.empty()
-                with m3: past_ph = st.empty()
-                with m4: future_ph = st.empty()
+                # with m3: past_ph = st.empty()
+                # with m4: future_ph = st.empty()
                 with m5: grand_total_ph = st.empty()
                 
                 # Initial State
                 wotc_ph.metric("WOTC Savings", "$0.00")
                 fez_ph.metric("FEZ Savings", "$0.00")
-                past_ph.metric("Past Credits", "$0.00")
-                future_ph.metric("Future Credits (per year)", "$0.00")
+                # past_ph.metric("Past Credits", "$0.00")
+                # future_ph.metric("Future Credits (per year)", "$0.00")
                 grand_total_ph.metric("GRAND TOTAL", "$0.00")
                 
                 prog_bar = st.progress(0)
@@ -600,8 +600,8 @@ if uploaded_file:
 
                 total_wotc = 0.0
                 total_fez = 0.0
-                total_past = 0.0
-                total_future = 0.0
+                # total_past = 0.0
+                # total_future = 0.0
                 results_data = []
 
                 for index, row in process_df.iterrows():
@@ -698,7 +698,7 @@ if uploaded_file:
 
                         status_text.text(f"Processing {row.get(col_id)} for Year {year}...")
                         
-                        raw_wotc, raw_fez, raw_past, raw_future = 0, 0, 0, 0
+                        raw_wotc, raw_fez = 0, 0
                         error_msg = None
 
                         try:
@@ -707,11 +707,12 @@ if uploaded_file:
                             if res.status_code == 200:
                                 d = res.json()
                                 raw_wotc = d.get('wotcCredit', 0) or 0
-                                raw_fez = d.get('fezCredit', 0) or 0
-                                raw_past = d.get('pastCredit', 0) or 0
+                                # raw_fez = d.get('fezCredit', 0) or 0
+                                # raw_past = d.get('pastCredit', 0) or 0
                                 raw_future = d.get('futureCredit', 0) or 0
                             else: error_msg = f"HTTP {res.status_code}"
                         except Exception as e: error_msg = str(e)
+                        # st.markdown(d)
                         final_wotc = float(raw_wotc)
                         final_fez = float(raw_fez)
 
@@ -725,15 +726,15 @@ if uploaded_file:
                         # --- AGGREGATE ---
                         total_wotc += final_wotc
                         total_fez += final_fez
-                        total_past += float(raw_past)
-                        total_future += float(raw_future)
-                        grand_total = total_wotc + total_fez + total_past + total_future
-                        # grand_total = total_wotc + total_fez  + total_future
+                        # total_past += float(raw_past)
+                        # total_future += float(raw_future)
+                        # grand_total = total_wotc + total_fez + total_past + total_future
+                        grand_total = total_wotc + total_fez  
 
                         wotc_ph.metric("WOTC Savings", f"${total_wotc:,.2f}")
                         fez_ph.metric("FEZ Savings", f"${total_fez:,.2f}")
-                        past_ph.metric("Past Credits", f"${total_past:,.2f}")
-                        future_ph.metric("Future Credits (per year)", f"${total_future:,.2f}")
+                        # past_ph.metric("Past Credits", f"${total_past:,.2f}")
+                        # future_ph.metric("Future Credits (per year)", f"${total_future:,.2f}")
                         grand_total_ph.metric("GRAND TOTAL", f"${grand_total:,.2f}")
 
                         row_result = {
@@ -742,8 +743,8 @@ if uploaded_file:
                             "API_Hire_Date": api_hire_date_str,
                             "API_Term_Date": api_term_date_str,
                             "WOTC": final_wotc, "FEZ": final_fez, 
-                            "Past": raw_past, "Future": raw_future,
-                            "Total": final_wotc + final_fez + raw_past + raw_future,
+                            # "Past": raw_past, "Future": raw_future,
+                            "Total": final_wotc + final_fez,
                             "Wage_Used": annualized_wage,
                             "Status": "Error" if error_msg else "Success"
                         }
